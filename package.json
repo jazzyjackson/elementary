@@ -1,6 +1,6 @@
 {
   "name": "@lookalive/elementary",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Not Another Templating Language",
   "main": "elementary.js",
   "scripts": {

@@ -1,7 +1,6 @@
 "use strict";
 exports.__esModule = true;
 var empty_elements = [
-    "!DOCTYPE html",
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"
 ];
 /**
@@ -26,7 +25,7 @@ function elementary(el) {
         }
     }
     else {
-        return el ? String(el) : "";
+        return el ? escapeEntity(String(el)) : "";
     }
 }
 /**
@@ -75,6 +74,18 @@ function bakeHTMLElement(el) {
             }
         }
         return interpolate(tagName, innerHTML, outerHTML);
+    }
+}
+function escapeEntity(html) {
+    if (/("|&|<|>)/.test(html)) {
+        return html
+            .replace('"', '&quot;')
+            .replace('&', '&amp;')
+            .replace('<', '&lt;')
+            .replace('>', '&gt;');
+    }
+    else {
+        return html;
     }
 }
 /**

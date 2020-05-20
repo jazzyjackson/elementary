@@ -39,7 +39,7 @@ function elementary(el: ElementaryDOM) : string
     }
     else
     {
-        return el ? String(el) : ""
+        return el ? escapeEntity(String(el)) : ""
     }
 }
 
@@ -99,6 +99,22 @@ function bakeHTMLElement(el: ELHTMLElement): string
         }
         
         return interpolate(tagName, innerHTML, outerHTML)
+    }
+}
+
+function escapeEntity(html: string): string
+{
+    if(/("|&|<|>)/.test(html))
+    {
+        return html
+        .replace('"', '&quot;')
+        .replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+    }
+    else
+    {
+        return html
     }
 }
 
