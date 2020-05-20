@@ -19,8 +19,9 @@
   },
   "homepage": "https://github.com/lookalive-software/elementary#readme",
   "dependencies": {
-    "js-beautify": "^1.11.0",
-    "ajv": "^6.12.2"
+    "@types/node": "^14.0.4",
+    "ajv": "^6.12.2",
+    "js-beautify": "^1.11.0"
   },
   "devDependencies": {
     "json-schema-to-typescript": "^9.1.0",
