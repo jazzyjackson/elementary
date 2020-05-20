@@ -1,20 +1,51 @@
 // given a filename as argument, verifies it against schema, converts to HTMLstring, runs it through prettifier
 // lets you redirect to file or use as cgi, output printed to stdout
-
-const Ajv = require('ajv')
-const elementarySchema = require('./schemas/schemas.json')
-const elementaryDOM = require(process.argv[2]) // loads DOM from JSON, reading file
-
+// I want to be able to run npm build-docs and convert elementaryDOM to HTML, maybe given a directory
+// someday I need to parse the results of ajv errors and try to turn it into an error message that actually tells you wear to look
+// maybe a least sort by most specificity?
 const elementary = require('./elementary')
+const beautify_html = require('js-beautify').html;
+const Ajv = require('ajv')
+const fs = require('fs')
+const path = require('path')
 
-var beautify_html = require('js-beautify').html;
+let validate = new Ajv().compile(require('./schemas/schemas.json'))
+let target = process.argv[2] // loads DOM from JSON, reading file
 
-var ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
-
-ajv.validate(elementarySchema, elementaryDOM);
-
-if (ajv.validate(elementarySchema, elementaryDOM)){
-    console.log(beautify_html(elementary(elementaryDOM)))
-} else {
-    console.log(ajv.errors)
+if(fs.statSync(target).isDirectory())
+{
+  fs.readdirSync(target)
+    .filter(file => /\.elem\.json$/.test(file))
+    .forEach(elementaryDOMFile =>
+    {
+        let {name}= path.parse(elementaryDOMFile)
+        let elementaryDOM = require(path.join(__dirname, target, elementaryDOMFile))
+        if (validate(elementaryDOM))
+        {
+            fs.writeFileSync(
+                path.join(target, name),
+                beautify_html(elementary(elementaryDOM))
+            )
+            console.log("✔️ completed " + elementaryDOMFile)
+        } 
+        else
+        {
+            console.log("❌ failed " + elementaryDOMFile)
+            console.log(validate.errors.sort((a,b) => a.dataPath.length - b.dataPath.length))
+            // maybe grab a temp file and write errors to a file?
+        }
+    }
+    )
+}
+else
+{
+    let elementaryDOM = require(target)
+    if (validate(elementaryDOM))
+    {
+        console.log(beautify_html(elementary(elementaryDOM)))
+    }
+    else
+    {
+        console.log(validate.errors)
+    }
 }
