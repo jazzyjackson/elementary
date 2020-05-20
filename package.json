@@ -5,6 +5,7 @@
   "main": "elementary.js",
   "scripts": {
     "test": "node tests/tests",
+    "build-docs":"node elementarycli ./docs",
     "rebuild-schema": "json2ts schemas/schemas.json > schemas/elementary.d.ts"
   },
   "repository": {
