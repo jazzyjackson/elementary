@@ -10,7 +10,7 @@ const fs = require('fs')
 const path = require('path')
 
 let validate = new Ajv().compile(require('./schemas/schemas.json'))
-let target = process.argv[2] // loads DOM from JSON, reading file
+let target = path.join(process.cwd(), process.argv[2]) // loads DOM from JSON, reading file
 
 if(fs.statSync(target).isDirectory())
 {
@@ -19,7 +19,7 @@ if(fs.statSync(target).isDirectory())
     .forEach(elementaryDOMFile =>
     {
         let name = elementaryDOMFile.slice(0, elementaryDOMFile.indexOf('.'))
-        let elementaryDOM = require(path.join(__dirname, target, elementaryDOMFile))
+        let elementaryDOM = require(path.join(target, elementaryDOMFile))
 
         if (validate(elementaryDOM))
         {
