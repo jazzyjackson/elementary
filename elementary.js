@@ -1,138 +1,160 @@
-const Type = require('@lookalive/type')
-const empty_elements = [
+"use strict";
+exports.__esModule = true;
+var empty_elements = [
     "!DOCTYPE html",
-    "area","base","br","col","embed","hr","img","input","link","meta","param","source","track","wbr"
-]
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"
+];
 /**
- * @param {object | array} template the source template in the form {tagname: {attrs}} or list thereof
- * @returns {string} the fully assembled HTML
+ *
+ * Elementary has to decide what to do based on the data structure passd to it
+ * An array is recursed over, an object is made into an HTMLElement or an HTMLStyleELement
+ * Null is turned into a blank string, bool, numbers and strings are returned as strings.
  */
-module.exports = dispatch
-
-function dispatch(template){
-    switch(Type.from(template).identity){
-        case Array:
-            return template.map(dispatch).join('')
-        case Object:
-            return Object.entries(template).shift().shift() // dig into the tagname of {tagname:{}}
-                .match(/^style$/i)
-                    ? makeStyleNode(template)
-                    : makeElementNode(template)
-        default:
-            return String(template)
+module.exports = elementary;
+function elementary(el) {
+    if (el instanceof Array) {
+        return el.map(elementary).join('');
     }
-}
-
-function makeStyleNode(template){
-    let CSSSelectorSets = Object.entries(template).pop().pop()
-    return interpolate('style', [makeCSSSelectorSet(CSSSelectorSets)])
-}
-
-function makeElementNode(template){
-    let [[tagName, attributePairs]] = Object.entries(template)
-
-    if(tagName == '!'){
-        return process.env.NOSCRIPT
-            ? `\n<!-- ${JSON.stringify(attributePairs)} -->\n`
-            : dispatch({script:[`console.warn(JSON.parse(${JSON.stringify(attributePairs)}))`]})
-    } else if(Type.isArray(attributePairs)){
-        // Arrays are used to skip attributes on the outerhtml and give child nodes directly, text nodes are no problem.
-        return interpolate(tagName, dispatch(attributePairs))
-    } else {
-        let innerHTML = new Array
-        let outerHTML = new Array
-
-        for(var [attributeName, attributeValue] of Object.entries(attributePairs)){
-            switch(attributeName.toLowerCase()){
-                case 'childnodes':
-                    innerHTML.push(dispatch(attributeValue)) // dispatch joins arrays into strings after mapping
-                    break
-                case 'style':
-                    attributeValue = makeCSSRuleValuePairs(attributeValue)
-                    outerHTML.push(makeHTMLAttribute(attributeName, attributeValue))
-                    break
-                default:
-                    outerHTML.push(makeHTMLAttribute(attributeName, attributeValue))
-             }
+    if (el instanceof Object) {
+        switch ( /* tagName */Object.keys(el).pop().toLowerCase()) {
+            case '!':
+                return bakeHTMLComment(el);
+            case 'style':
+                return bakeHTMLStyleElement(el);
+            default:
+                return bakeHTMLElement(el);
         }
-        
-        return interpolate(tagName, innerHTML, outerHTML)
+    }
+    else {
+        return el ? String(el) : "";
     }
 }
-
 /**
- * @param {templateObject} template A style descriptor, ex {style: {body: {margin: 0, padding: 0}}}
- * @return {string} The interpolated style tag, ex <style> body { margin: 0; padding: 0; } </style>
+ * Elementary DOM use '!' as a special tagname to indicate a comment that can be printed to the console
+ * Could be modified to allow arbitrary object to get printed to console but I'll keep it simple to start
  */
-function makeStyleElement(template){
-    //assertSchema('StyleElement', template)
-    // one weakness of using this shorthand for style elements is I skip support for attributes on the style tag -- type, media, title
-    // so all I can say for now is if you want those things use a link element, for inline style this is all that's available.
-    // Could make a distinciton between style elements with objects vs arrays as the cssSelector sets to allow this
-     let [[tagName, cssSelectorSet]] = Object.entries(template)
-     return interpolate(tagName, Array(makeCSSSelectorSet(cssSelectorSet)))
+function bakeHTMLComment(comment) {
+    return process.env.NOSCRIPT
+        ? "<!-- " + JSON.stringify(comment["!"]) + " -->"
+        : "<script>console.warn(JSON.parse(" + JSON.stringify(comment["!"]) + "))</script>";
 }
-
 /**
- * 
- * @param {array | object} cssSelectorSet ex. {body: {margin: 0, padding: 0}} or list thereof
- * @param {string} seperator choose whether you want newline separated selectors
- * @return {string} The result of concatenating the selector name (eg body) with the result of making rule pairs, the innerHTML of a style tag
- * Handles media and other @ tags by recursing the rule set and enclosing it in brackets
+ * Everything besides <!-- --> and <style> is a generic HTML element
+ * Elementary HTML elements have one of two structures:
+ * {tagName: ELElement[]}
+ * or
+ * {tagName: {
+ *      style?: ELCSSStyleDeclaration;
+ *      childNodes?: ELHTMLElement[];
+ *      [HTMLAttribute: string]: string;
+ * }}
+ *
  */
-function makeCSSSelectorSet(cssSelectorSet, seperator = '\n'){
-    if(Type.isArray(cssSelectorSet)){
-        return cssSelectorSet.map(makeCSSSelectorSet).join(seperator)
-    } else {
-        return Object.entries(cssSelectorSet).map(
-            ([selector, ruleValuePair]) => 
-                selector[0] == '@'
-                    ? `${selector} {${makeCSSSelectorSet(ruleValuePair)}}`
-                    : `${selector} {${makeCSSRuleValuePairs(ruleValuePair)}}`
-        ).join(seperator)
+function bakeHTMLElement(el) {
+    var _a = Object.entries(el)[0], tagName = _a[0], attributes = _a[1];
+    if (attributes instanceof Array) {
+        return interpolate(tagName, /* innerHTML (childNodes) */ attributes.map(elementary));
+    }
+    else {
+        var innerHTML = [];
+        var outerHTML = [];
+        for (var _i = 0, _b = Object.entries(attributes); _i < _b.length; _i++) {
+            var _c = _b[_i], attributeName = _c[0], attributeValue = _c[1];
+            switch (attributeName) {
+                case 'childNodes':
+                    // convert entire childNodes array to a string representing the innerHTML of those nodes
+                    innerHTML.push(elementary(attributeValue));
+                    break;
+                case 'style':
+                    // stringify the CSSStyleDeclaration to inline css, defaults to using space as separator between rules
+                    outerHTML.push(" style=\"" + bakeCSSStyleDeclaration(attributeValue) + "\"");
+                    break;
+                default:
+                    // should probably sanitize these values with .replace('"', '&quot;').replace('&', '&amp;') etc
+                    outerHTML.push(" " + attributeName + "=\"" + attributeValue + "\"");
+            }
+        }
+        return interpolate(tagName, innerHTML, outerHTML);
     }
 }
-
 /**
- * @param  {object} RuleValuePairs ex. {width: "100px", height: "50px"}
- * @param  {string} [seperator] optional, actually I don't know what you would use anything besides default ' '
- * @return {string} ex. `width: 100px; height: 50px;` ready to embed in an attribute or style tag.
+ * Called for HTMLElements whose tagName is style
+ * Doesn't support html attributes on the style tag, use a link tag to external stylesheet if you need media/type attributes
  */
-function makeCSSRuleValuePairs(RuleValuePairs, seperator = ' '){
-    // assertSchema('CSSRuleValuePairs', RuleValuePairs)
-    return Object.entries(RuleValuePairs).map(([rule, value]) => 
-        `${rule}: ${Array.isArray(value) ? value.join('') : value};`
-    ).join(seperator)
+function bakeHTMLStyleElement(el) {
+    return interpolate("style", [bakeCSSStyleSheet(el.style)]);
 }
-
 /**
- * @param  {string} attrName 
- * @param  {string} attrValue
- * @return {string} 
- * the leading space is intentional by the way,
- * so space only exists in <tagName> before any attributes,
- * so if there's no attributes, no extra space inside the tag.
+ * Elementary CSSStyleSheets take the form
+ * {[selectorText: string]: CSSStyleDeclaration }
+ * However, selectorText starting with '@' defines at rules that can take one of 3 forms, flat, normal, or nested
+ *
+ * Is only ever called to stitch together the "innerHTML" of a <style> tag
  */
-function makeHTMLAttribute(attrName, attrValue){
-    attrValue = attrValue
-        .replace('"', '&quot;')
-        .replace('&', '&amp;')
-    return ` ${attrName}="${attrValue}"`
+function bakeCSSStyleSheet(stylesheet) {
+    var CSSRules = [];
+    for (var _i = 0, _a = Object.entries(stylesheet); _i < _a.length; _i++) {
+        var _b = _a[_i], selectorText = _b[0], rule = _b[1];
+        if (selectorText[0] == '@') {
+            switch (extractAtRule(selectorText)) {
+                case 'namespace':
+                case 'charset':
+                case 'import':
+                    // 'flat' rules, one liner, like '@import url("fineprint.css") print; have no body'
+                    CSSRules.push(selectorText + " " + rule + ";");
+                    break;
+                case 'keyframes':
+                case 'media':
+                case 'supports':
+                    // 'nested' rules, like '@media screen and (min-width: 900px)' recurse this function for their body
+                    CSSRules.push(selectorText + " {" + bakeCSSStyleSheet(rule) + "}");
+                    break;
+                case 'font-face':
+                case 'page':
+                    // 'normal' rules aren't any different than non-@-rules, embed CSSStyleDeclaration as their body
+                    CSSRules.push(selectorText + " {" + bakeCSSStyleDeclaration(rule) + "}");
+            }
+        }
+        else {
+            CSSRules.push(selectorText + " {" + bakeCSSStyleDeclaration(rule) + "}");
+        }
+    }
+    return CSSRules.join('\n');
 }
-
 /**
- * @param  {string} tagName
- * @param  {array | string | null}  outerHTML A list of strings produced by makeHTMLAttributes, null is OK
- * @param  {array | string | null}  innerHTML A list of pre-interpolated childnodes, the child nodes / text
- * @return {string} The HTML string after interpolation
+ * A helper function for bakeCSSStyleSheet's switch statement, for @import, @font-face, etc
+ * Is only called after confirming that selectorText starts with an '@', so its a string of at least length one
  */
-function interpolate(tagName, innerHTML = [], outerHTML = []){
-    innerHTML = Type.isArray(innerHTML) ? innerHTML.join('') : innerHTML // taking care not to add space between HTML tags
-    outerHTML = Type.isArray(outerHTML) ? outerHTML.join('') : outerHTML // and attributes will have their own spaces embedded
+function extractAtRule(selectorText) {
+    if (selectorText.includes(' ')) {
+        return selectorText.slice(1, selectorText.indexOf(' '));
+    }
+    else {
+        return selectorText.slice(1);
+    }
+}
+/**
+ * Takes an object which is a mapping
+ * I want to use TypeScript DOM's CSSStyleDeclaration type so I validate css descriptor names,
+ * but that requires using javascriptish camel case and converting to valid css, which I kind of don't like.
+ * and TypeScript CSSStyleDeclaration doens't include the 'src' descriptor for @font-face, so I would need to add that somehow
+ *
+ * defaults to separating declarations with a single space for inline style, but overridden with '\n' for stylesheets
+ */
+function bakeCSSStyleDeclaration(RuleValuePairs) {
+    return Object.entries(RuleValuePairs).map(function (_a) {
+        var CSSPropertyName = _a[0], CSSPropertyValue = _a[1];
+        return CSSPropertyName + ": " + CSSPropertyValue + ";";
+    }).join(' ');
+}
+function interpolate(tagName, innerHTML, outerHTML) {
+    if (innerHTML === void 0) { innerHTML = []; }
+    if (outerHTML === void 0) { outerHTML = []; }
     // cant deal with arguments of improper type, will throw error calling join
-    if(empty_elements.includes(tagName)){
-        return `\n<${tagName}${outerHTML}>`
-    } else {
-        return `\n<${tagName}${outerHTML}>${innerHTML}</${tagName}>`
+    if (empty_elements.includes(tagName)) {
+        return "<" + tagName + outerHTML.join('') + ">";
+    }
+    else {
+        return "<" + tagName + outerHTML.join('') + ">" + innerHTML.join('') + "</" + tagName + ">";
     }
 }

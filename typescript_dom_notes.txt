@@ -1,0 +1,141 @@
+
+flat:
+    @namespace NAMESPACE_RULE
+        <CSSNamespaceRule extends CSSRule>
+        + namespaceURI: string
+        + prefix: string
+    @charset CHARSET_RULE <???>
+    @import IMPORT_RULE
+        <CSSImportRule extends CSSRule>
+        + href: string
+        + media: MediaList
+        + styleSheet: CSSStyleSheet
+nested:
+    @keyframes KEYFRAMES_RULE
+        <CSSKeyframesRule extends CSSRule>
+        + cssRules: CSSRuleList (but acutally a KEYFRAME_RULE list)
+        + name: string
+        KEYFRAME_RULE
+        <CSSKeyframeRule extends CSSRule>
+            + keyText: string (actualy just from, to, and percentages)
+            + style: CSSStyleDeclaration
+    @media MEDIA_RULE
+        <CSSMediaRule extends CSSConditionRule >
+        + media: MediaList
+    @supports SUPPORTS_RULE
+        <CSSPageRule extends CSSConditionRule>
+
+normal: These are structured same as CSSStyleRule, 
+    @font-face FONT_FACE_RULE <CSSFontFaceRule extends CSSRule>
+        + style:CSSStyleDeclaration
+    @page PAGE_RULE
+        <CSSPageRule extends CSSGroupingRule>
+        + selectorText
+
+
+GroupingRule
+    <CSSGroupingRule extends CSSRule>
+    + cssRules: CSSRuleList
+ConditionRule
+    <CSSConditionRule extends CSSGroupingRule>
+    + conditionText: string
+
+CSSStyleRule extends CSSRule
+    + selectorText
+    + style
+
+CSSRule // base class
+    + cssText
+
+CSSRuleList: ordered collection of CSSRule[]
+CSSStyleSheet: container for { cssRules: CSSRuleList }
+
+<style>
+HTMLStyleElement extends HTMLElement, LinkStyle {
+    media: string
+    type: string
+    sheet: CSSStyleSheet
+}
+
+interface HTMLElement extends
+    Element extends
+        Node extends
+            EventTarget
+            +  childNodes: NodeListOf<ChildNode>
+            +  textContent: string | null;
+        Animatable
+        ChildNode
+        InnerHTML
+            + innerHTML: string
+        NonDocumentTypeChildNode
+            + nextElementSibling: Element | null
+            + previousElementSibling: Element | null
+        ParentNode
+            + childElementCount: number
+            + children: HTMLCollection
+        Slotable
+        + attributes: NamedNodeMap
+        + classList: DOMTokenList
+        + id: string
+        + tagName: string
+
+    DocumentAndElementEventHandlers
+    ElementCSSInlineStyle
+        + style: CSSStyleDeclaration
+    ElementContentEditable
+    GlobalEventHandlers
+    HTMLOrSVGElement
+    + draggable: boolean
+    + spellcheck: boolean
+    + title: string
+    + innerText: string
+    + dir: string (but actually rtl | ltr | auto)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CSSStyleDeclaration
+{
+    rule: value
+    ...
+}
+
+CSSStyleRule extends CSSRule {
+    cssText: string (from CSSRule)
+    selectorText: string,
+    cssRules: CSSStyleDeclaration
+}
+
+
+
+interface CSSConditionRule extends CSSGroupingRule {
+    conditionText: string;
+    cssRules: CSSRuleList (from CSSGroupingRule)
+}
+
+
+laCSSStyleDeclaration
+{
+    rule: value
+    ...
+}
+laCSSStyleRuleMap
+{
+    selector: CSSStyleDeclaration
+    condition: CSSStyleRuleMap
+    ...
+}
+laHTMLElement
+{
+
+}

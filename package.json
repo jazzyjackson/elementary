@@ -1,14 +1,17 @@
 {
   "name": "@lookalive/elementary",
-  "version": "0.1.0",
-  "description": "Not Another Templating Language ",
+  "version": "0.2.0",
+  "description": "Not Another Templating Language",
   "main": "elementary.js",
-  "dependencies": {
-    "@lookalive/type": "^1.0.0"
+  "devDependencies": {
+    "@types/node": "^14.0.1",
+    "ajv": "^6.12.2",
+    "json-schema-to-typescript": "^9.1.0",
+    "typescript": "^3.9.2"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "node tests"
+    "test": "node tests/tests",
+    "rebuild-schema":"json2ts schemas/schemas.json > schemas/elementary.d.ts"
   },
   "repository": {
     "type": "git",
@@ -19,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/lookalive-software/elementary/issues"
   },
-  "homepage": "https://github.com/lookalive-software/elementary#readme"
+  "homepage": "https://github.com/lookalive-software/elementary#readme",
+  "dependencies": {
+    "js-beautify": "^1.11.0"
+  }
 }
