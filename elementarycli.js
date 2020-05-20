@@ -18,8 +18,9 @@ if(fs.statSync(target).isDirectory())
     .filter(file => /\.elem\.json$/.test(file))
     .forEach(elementaryDOMFile =>
     {
-        let {name}= path.parse(elementaryDOMFile)
+        let name = elementaryDOMFile.slice(0, elementaryDOMFile.indexOf('.'))
         let elementaryDOM = require(path.join(__dirname, target, elementaryDOMFile))
+
         if (validate(elementaryDOM))
         {
             fs.writeFileSync(
