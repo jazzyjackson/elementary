@@ -23,7 +23,7 @@ if(fs.statSync(target).isDirectory())
         if (validate(elementaryDOM))
         {
             fs.writeFileSync(
-                path.join(target, name),
+                path.join(target, name + '.html'),
                 beautify_html(elementary(elementaryDOM))
             )
             console.log("✔️ completed " + elementaryDOMFile)
