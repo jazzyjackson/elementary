@@ -25,14 +25,14 @@
         },
         "ELHTMLStyleElement":{
             "type":"object",
-			"minProperties": 1,
-			"maxProperties": 1,
-			"required": ["style"],
-			"properties": {
-				"style": {
-					"$ref":"#/definitions/ELCSSStyleSheet"
-				}
-			}
+            "minProperties": 1,
+            "maxProperties": 1,
+            "required": ["style"],
+            "properties": {
+                "style": {
+                    "$ref":"#/definitions/ELCSSStyleSheet"
+                }
+            }
         },
         "ELHTMLElement":{
             "type": "object",
@@ -40,8 +40,8 @@
             "minProperties": 1,
             "maxProperties": 1,
             "description":"HTMLElements have a single property: a tagname, with a value of an array of childNodes | an object of HTML attributes ",
-			"patternProperties": {
-				"^[A-Za-z]+[A-Za-z0-9_]*": {
+            "patternProperties": {
+                "^[A-Za-z]+[A-Za-z0-9_]*": {
                     "oneOf":[{
                         "type":"array",
                         "description":"The single tagname property may have an array as a shortcut to providing childnodes",
@@ -69,21 +69,21 @@
         },
         "ELHTMLComment":{
             "type":"object",
-			"minProperties": 1,
-			"maxProperties": 1,
-			"required": ["!"],
-			"properties": {
-				"!": {
-					"type":"string"
-				}
-			}
+            "minProperties": 1,
+            "maxProperties": 1,
+            "required": ["!"],
+            "properties": {
+                "!": {
+                    "type":"string"
+                }
+            }
         },
         "ELCSSStyleDeclaration":{
             "type":"object",
-			"description":"CSS properties and their values",
-			"additionalProperties": {
-				"type": "string"
-			}
+            "description":"CSS properties and their values",
+            "additionalProperties": {
+                "type": "string"
+            }
         },
         "ELCSSStyleSheet":{
             "patternProperties":{
@@ -91,10 +91,10 @@
                     "type": "string"
                 },
                 "^@(keyframes|media|supports)": {
-					"$ref":"#/definitions/ELCSSStyleSheet"
+                    "$ref":"#/definitions/ELCSSStyleSheet"
                 },
                 "^@(font-face|page)":{
-					"$ref":"#/definitions/ELCSSStyleDeclaration"
+                    "$ref":"#/definitions/ELCSSStyleDeclaration"
                 }
             },
             "additionalProperties": {
