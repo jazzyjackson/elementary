@@ -13,7 +13,7 @@
      * An array is recursed over, an object is made into an HTMLElement or an HTMLStyleELement
      * Null is turned into a blank string, bool, numbers and strings are returned as strings.
      */
-    function elementary(el: El.ElementaryDOM) : string
+    function elementary(el: El.ementaryDOM) : string
     {
         if(el instanceof Array)
         {
@@ -24,11 +24,11 @@
             switch(/* tagName */ Object.keys(el).pop().toLowerCase())
             {
                 case '!':
-                    return bakeHTMLComment(el as El.ELHTMLComment)
+                    return bakeHTMLComment(el as El.HTMLComment)
                 case 'style':
-                    return bakeHTMLStyleElement(el as El.ELHTMLStyleElement)
+                    return bakeHTMLStyleElement(el as El.HTMLStyleElement)
                 default:
-                    return bakeHTMLElement(el as El.ELHTMLElement)
+                    return bakeHTMLElement(el as El.HTMLElement)
             }
         }
         else
@@ -42,7 +42,7 @@
      * Elementary DOM use '!' as a special tagname to indicate a comment that can be printed to the console
      * Could be modified to allow arbitrary object to get printed to console but I'll keep it simple to start
      */
-    function bakeHTMLComment(comment: El.ELHTMLComment): string
+    function bakeHTMLComment(comment: El.HTMLComment): string
     {
         return process.env.NOSCRIPT
             ? `<!-- ${JSON.stringify(comment["!"])} -->`
@@ -61,7 +61,7 @@
      * }}
      * 
      */
-    function bakeHTMLElement(el: El.ELHTMLElement): string
+    function bakeHTMLElement(el: El.HTMLElement): string
     {
         let [[tagName, attributes]] = Object.entries(el)
 
@@ -80,11 +80,11 @@
                 {
                     case 'childNodes':
                         // convert entire childNodes array to a string representing the innerHTML of those nodes
-                        innerHTML.push(elementary(attributeValue as El.ELElement[]))
+                        innerHTML.push(elementary(attributeValue as El.Element[]))
                         break
                     case 'style':
                         // stringify the CSSStyleDeclaration to inline css, defaults to using space as separator between rules
-                        outerHTML.push(` style="${bakeCSSStyleDeclaration(attributeValue as El.ELCSSStyleDeclaration)}"`)
+                        outerHTML.push(` style="${bakeCSSStyleDeclaration(attributeValue as El.CSSStyleDeclaration)}"`)
                         break
                     default:
                         // should probably sanitize these values with .replace('"', '&quot;').replace('&', '&amp;') etc
@@ -116,7 +116,7 @@
      * Called for HTMLElements whose tagName is style
      * Doesn't support html attributes on the style tag, use a link tag to external stylesheet if you need media/type attributes
      */
-    function bakeHTMLStyleElement(el: El.ELHTMLStyleElement): string
+    function bakeHTMLStyleElement(el: El.HTMLStyleElement): string
     {
         return interpolate("style", [bakeCSSStyleSheet(el.style)])
     }
@@ -128,7 +128,7 @@
      * 
      * Is only ever called to stitch together the "innerHTML" of a <style> tag
      */
-    function bakeCSSStyleSheet(stylesheet: El.ELCSSStyleSheet): string
+    function bakeCSSStyleSheet(stylesheet: El.CSSStyleSheet): string
     {
         let CSSRules = []
         for(var [selectorText, rule] of Object.entries(stylesheet))
@@ -147,17 +147,17 @@
                     case 'media':
                     case 'supports':
                         // 'nested' rules, like '@media screen and (min-width: 900px)' recurse this function for their body
-                        CSSRules.push(`${selectorText} {${bakeCSSStyleSheet(rule as El.ELCSSStyleSheet)}}`)
+                        CSSRules.push(`${selectorText} {${bakeCSSStyleSheet(rule as El.CSSStyleSheet)}}`)
                         break
                     case 'font-face':
                     case 'page':
                         // 'normal' rules aren't any different than non-@-rules, embed CSSStyleDeclaration as their body
-                        CSSRules.push(`${selectorText} {${bakeCSSStyleDeclaration(rule as El.ELCSSStyleDeclaration)}}`)
+                        CSSRules.push(`${selectorText} {${bakeCSSStyleDeclaration(rule as El.CSSStyleDeclaration)}}`)
                 }
             }
             else
             {
-                CSSRules.push(`${selectorText} {${bakeCSSStyleDeclaration(rule as El.ELCSSStyleDeclaration)}}`)
+                CSSRules.push(`${selectorText} {${bakeCSSStyleDeclaration(rule as El.CSSStyleDeclaration)}}`)
             }
         }
         return CSSRules.join('\n')
@@ -187,7 +187,7 @@
      * 
      * defaults to separating declarations with a single space for inline style, but overridden with '\n' for stylesheets
      */
-    function bakeCSSStyleDeclaration(RuleValuePairs: El.ELCSSStyleDeclaration): string
+    function bakeCSSStyleDeclaration(RuleValuePairs: El.CSSStyleDeclaration): string
     {
         return Object.entries(RuleValuePairs).map
         (

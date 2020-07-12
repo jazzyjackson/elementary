@@ -1,5 +1,5 @@
 const assert = require('assert')
-const elementary = require('../elementary')
+const {elementary} = require('../elementary')
 
 assert.strictEqual(elementary(["what a message!"]), 'what a message!')
 assert.strictEqual(elementary({p: ["what a message!"]}), '<p>what a message!</p>')

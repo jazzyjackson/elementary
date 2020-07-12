@@ -6,23 +6,22 @@
  * LM
  */
 declare namespace El {
-
-  export type ElementaryDOM = ELElement | ELElement[];
-  export type ELElement = string | number | null | boolean | ELHTMLElement | ELHTMLStyleElement | ELHTMLComment;
+  export type ementaryDOM = Element | Element[];
+  export type Element = string | number | null | boolean | HTMLElement | HTMLStyleElement | HTMLComment;
 
   /**
    * HTMLElements have a single property: a tagname, with a value of an array of childNodes | an object of HTML attributes
    */
-  export interface ELHTMLElement {
+  export interface HTMLElement {
     /**
      * This interface was referenced by `ELHTMLElement`'s JSON-Schema definition
      * via the `patternProperty` "^[A-Za-z]+[A-Za-z0-9_]*".
      */
     [k: string]:
-      | ELElement[]
+      | Element[]
       | {
-          style?: ELCSSStyleDeclaration;
-          childNodes?: ELElement[];
+          style?: CSSStyleDeclaration;
+          childNodes?: Element[];
           [k: string]: unknown;
         };
   }
@@ -32,17 +31,17 @@ declare namespace El {
    * This interface was referenced by `ELCSSStyleSheet`'s JSON-Schema definition
    * via the `patternProperty` "^@(font-face|page)".
    */
-  export interface ELCSSStyleDeclaration {
+  export interface CSSStyleDeclaration {
     [k: string]: string;
   }
-  export interface ELHTMLStyleElement {
-    style: ELCSSStyleSheet;
+  export interface HTMLStyleElement {
+    style: CSSStyleSheet;
     [k: string]: unknown;
   }
-  export interface ELCSSStyleSheet {
+  export interface CSSStyleSheet {
     [k: string]: unknown;
   }
-  export interface ELHTMLComment {
+  export interface HTMLComment {
     "!": string;
     [k: string]: unknown;
   }

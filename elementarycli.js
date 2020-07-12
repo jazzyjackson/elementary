@@ -3,7 +3,7 @@
 // I want to be able to run npm build-docs and convert elementaryDOM to HTML, maybe given a directory
 // someday I need to parse the results of ajv errors and try to turn it into an error message that actually tells you wear to look
 // maybe a least sort by most specificity?
-const elementary = require('./elementary')
+const {elementary} = require('./elementary')
 const beautify_html = require('js-beautify').html;
 const Ajv = require('ajv')
 const fs = require('fs')
