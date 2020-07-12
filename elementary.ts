@@ -98,18 +98,16 @@
 
     function escapeEntity(html: string): string
     {
-        if(/("|&|<|>)/.test(html))
-        {
-            return html
-            .replace(/"/g, '&quot;')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-        }
-        else
-        {
-            return html
-        }
+
+        return /("|'|&|<|>)/.test(html)
+            ? html.replace(/("|'|&|<|>)/g, match => ({
+                    "\"": "&quot;",
+                    "'": "&apos;",
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                })[match])
+            : html
     }
 
     /**

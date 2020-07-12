@@ -40,7 +40,7 @@ assert.strictEqual(
         ]}
     ),
     '<pre>' + 
-        '{&amp;quot;key&amp;quot;:&amp;quot;value&amp;quot;}' +
+        '{&quot;key&quot;:&quot;value&quot;}' +
     '</pre>'
 )
 
