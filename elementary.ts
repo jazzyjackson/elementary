@@ -206,3 +206,20 @@
         }
     }
 })(typeof exports === 'undefined' ? this : exports);
+
+// I'm thinking, I can check if Object.keys(dom).pop() != 'html', wrap the dom with this header
+function htmlwrap(content: El.Element[]): El.ementaryDOM {
+    return [
+        {"html":[
+            {"head": [
+                {"meta":{"charset":"UTF-8"}},
+                {"link":{
+                    "rel":"icon",
+                    "type":"image/x-icon",
+                    "href":"data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII="
+                }}
+            ]},
+            {"body": content}
+        ]}
+    ]
+}
