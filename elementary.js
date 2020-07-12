@@ -79,10 +79,10 @@
     function escapeEntity(html) {
         if (/("|&|<|>)/.test(html)) {
             return html
-                .replace('"', '&quot;')
-                .replace('&', '&amp;')
-                .replace('<', '&lt;')
-                .replace('>', '&gt;');
+                .replace(/"/g, '&quot;')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
         }
         else {
             return html;

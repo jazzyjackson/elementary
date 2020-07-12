@@ -32,6 +32,18 @@ assert.strictEqual(
     '<style>body {margin: 0; padding: 0; box-sizing: border-box;}</style></head>'
 )
 
+// should replace all quotes, ampersands etc with html entity, not just the first occurance
+assert.strictEqual(
+    elementary(
+        {"pre": [
+            "{\"key\":\"value\"}"
+        ]}
+    ),
+    '<pre>' + 
+        '{&amp;quot;key&amp;quot;:&amp;quot;value&amp;quot;}' +
+    '</pre>'
+)
+
 assert.strictEqual(
     elementary([
         {"!DOCTYPE html": {}},
