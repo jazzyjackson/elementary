@@ -1,8 +1,13 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "module":"none",
+        "moduleResolution": "node",
         "lib": ["es6", "dom"],
-        "typeRoots": ["node_modules/@types","schemas"]
-
+        "typeRoots": ["node_modules/@types","schemas"],
+        "baseUrl": ".",
     },
+    "include":[
+        "./schemas/elementary.d.ts"
+    ]
 }
