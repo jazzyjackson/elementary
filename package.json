@@ -1,14 +1,14 @@
 {
   "name": "@lookalive/elementary",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Not Another Templating Language",
   "main": "elementary.js",
   "scripts": {
     "test": "node tests/tests",
-    "build-docs":"node elementarycli ./docs",
+    "build-docs": "node elementarycli ./docs",
     "rebuild-schema": "json2ts schemas/schemas.json > schemas/elementary.d.ts"
   },
-  "types":"./schemas/elementary.d.ts",
+  "types": "./schemas/elementary.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lookalive-software/elementary.git"
