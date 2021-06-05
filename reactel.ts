@@ -1,5 +1,6 @@
 /// <reference path="schemas/elementary.d.ts"/>
 
+
 // a minimum viable function
 // call React.createElement recursively from within a global method
 
@@ -25,6 +26,10 @@
      */
     function elementary(el: El.ementaryDOM) : React.ReactNode 
     {
+        if(el instanceof Function)
+        {
+            return React.createElement(el as any)
+        }
         if(el instanceof Array)
         {
             return el.map(elementary) // an array is a valid reactNode
