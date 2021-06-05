@@ -13,12 +13,13 @@
     <script>
     // okay now use elementary in the render function of an app
 
-    function Circle({radius}){
+    function Circle({radius, color}){
         radius = Number(radius) * 100
 
-        return elementary({div: {
+        return elementary(
+        {div: {
             style: {
-                background: 'black',
+                background: color,
                 width: radius + 'px',
                 height: radius + 'px',
                 borderRadius: '50%'
@@ -26,7 +27,8 @@
         }})
     }
     function RadiusInput({name, value, onChange}){
-        return elementary({input: {
+        return elementary(
+        {input: {
             type: 'range',
             step: '0.01',
             min: '1',
@@ -34,14 +36,16 @@
             name,
             value,
             onChange
-        }})
+        }}
+        )
     }
     
     class App extends React.Component {
         constructor(props){
             super(props)
             this.state = {
-                radius: 1
+                radius: 1,
+                color: '#ffaa00',
             }
             this.handleChange = this.handleChange.bind(this)
         }
@@ -57,9 +61,15 @@
                         name: 'radius',
                         value: this.state.radius,
                         onChange: this.handleChange
+                    }},
+                    {input: {
+                        name: 'color',
+                        type: 'color',
+                        value: this.state.color,
+                        onChange: this.handleChange
                     }}
                 ]},
-                {Circle: {radius: this.state.radius}}
+                {Circle: {radius: this.state.radius, color: this.state.color}}
             ])
         }
     }
