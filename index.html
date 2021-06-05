@@ -13,33 +13,54 @@
     <script>
     // okay now use elementary in the render function of an app
 
-    function NumberRow({count}){
-        return elementary(`I've been clicked ${count} times`)
+    function Circle({radius}){
+        radius = Number(radius) * 100
+
+        return elementary({div: {
+            style: {
+                background: 'black',
+                width: radius + 'px',
+                height: radius + 'px',
+                borderRadius: '50%'
+            }
+        }})
+    }
+    function RadiusInput({name, value, onChange}){
+        return elementary({input: {
+            type: 'range',
+            step: '0.01',
+            min: '1',
+            max: '5',
+            name,
+            value,
+            onChange
+        }})
     }
     
     class App extends React.Component {
         constructor(props){
             super(props)
-            console.log("making app")
             this.state = {
-                count: 0
+                radius: 1
             }
+            this.handleChange = this.handleChange.bind(this)
         }
 
-        increment(){
-            this.setState({
-                count: this.state.count + 1
-            })
+        handleChange(event){
+            this.setState({[event.target.name]: event.target.value})
         }
 
         render(){
-            return elementary({div: {
-                onClick: this.increment.bind(this),
-                children: [
-                    {h1: ["hello world"]},
-                    {NumberRow: {count: this.state.count}}
-                ]
-            }})
+            return elementary([
+                {form: [
+                    {RadiusInput: {
+                        name: 'radius',
+                        value: this.state.radius,
+                        onChange: this.handleChange
+                    }}
+                ]},
+                {Circle: {radius: this.state.radius}}
+            ])
         }
     }
     ReactDOM.render(

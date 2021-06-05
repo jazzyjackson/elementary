@@ -48,7 +48,7 @@
         if (window[tagName]) {
             tagName = window[tagName];
         }
-        console.log({ tagName: tagName, attributes: attributes });
+        // console.log({tagName, attributes})
         if (attributes instanceof Array) {
             // return interpolate(tagName, /* innerHTML (childNodes) */ attributes.map(elementary))
             return React.createElement(tagName, null, elementary(attributes));
