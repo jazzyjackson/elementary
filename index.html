@@ -51,25 +51,28 @@
         }
 
         handleChange(event){
-            this.setState({[event.target.name]: event.target.value})
+            this.setState({
+                [event.target.name]: event.target.value
+            })
         }
 
         render(){
+            let {radius, color} = this.state
             return elementary([
                 {form: [
                     {RadiusInput: {
                         name: 'radius',
-                        value: this.state.radius,
+                        value: radius,
                         onChange: this.handleChange
                     }},
                     {input: {
                         name: 'color',
                         type: 'color',
-                        value: this.state.color,
+                        value: color,
                         onChange: this.handleChange
                     }}
                 ]},
-                {Circle: {radius: this.state.radius, color: this.state.color}}
+                {Circle: {radius, color}}
             ])
         }
     }
