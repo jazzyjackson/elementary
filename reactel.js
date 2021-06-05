@@ -6,9 +6,6 @@
 // outerHTML is a rolled up object of all the attributes, maybe I'll replace class with className on the call step
 // So I have types for my input object, El.ementaryDOM
 // I just need a type for my output, a React Element
-function makeRoot(root) {
-    return React.createElement(root);
-}
 (function (exports) {
     exports.elementary = elementary;
     var empty_elements = [
@@ -48,6 +45,10 @@ function makeRoot(root) {
         var _a = Object.entries(el)[0], tagName = _a[0], attributes = _a[1];
         // why not allow attributes to be a string, and let {"h1": "hello world"} be valid Elem?
         // because then there's 3 different types of attribute, this way there's only 2
+        if (window[tagName]) {
+            tagName = window[tagName];
+        }
+        console.log({ tagName: tagName, attributes: attributes });
         if (attributes instanceof Array) {
             // return interpolate(tagName, /* innerHTML (childNodes) */ attributes.map(elementary))
             return React.createElement(tagName, null, elementary(attributes));

@@ -59,7 +59,10 @@
         let [[tagName, attributes]] = Object.entries(el)
         // why not allow attributes to be a string, and let {"h1": "hello world"} be valid Elem?
         // because then there's 3 different types of attribute, this way there's only 2
-
+        if(window[tagName]){
+            tagName = window[tagName]
+        }
+        console.log({tagName, attributes})
         if(attributes instanceof Array)
         {
             // return interpolate(tagName, /* innerHTML (childNodes) */ attributes.map(elementary))
