@@ -23,8 +23,8 @@
         {
             switch(/* tagName */ Object.keys(el).pop().toLowerCase())
             {
-                case '!':
-                    return bakeHTMLComment(el as El.HTMLComment)
+                // case '!':
+                //     return bakeHTMLComment(el as El.HTMLComment)
                 case 'style':
                     return bakeHTMLStyleElement(el as El.HTMLStyleElement)
                 default:
@@ -42,11 +42,12 @@
      * Elementary DOM use '!' as a special tagname to indicate a comment that can be printed to the console
      * Could be modified to allow arbitrary object to get printed to console but I'll keep it simple to start
      */
-    function bakeHTMLComment(comment: El.HTMLComment): string
+    function bakeHTMLComment(comment: El.HTMLComment): void
     {
-        return process.env.NOSCRIPT
-            ? `<!-- ${JSON.stringify(comment["!"])} -->`
-            : `<script>console.warn(JSON.parse(${JSON.stringify(comment["!"])}))</script>`
+        console.warn(comment)
+        // return process.env.NOSCRIPT
+        //     ? `<!-- ${JSON.stringify(comment["!"])} -->`
+        //     : `<script>console.warn(JSON.parse(${JSON.stringify(comment["!"])}))</script>`
     }
 
     /**
@@ -198,7 +199,9 @@
         // cant deal with arguments of improper type, will throw error calling join
         if(empty_elements.includes(tagName))
         {
-            return `<${tagName}${outerHTML.join('')}>`
+            // return `<${tagName}${outerHTML.join('')}>`
+            // tagName is string or class, outerHTML is the props object, innerHTML is React-Elementy children
+            // return React.createElement(tagName, outerHTML,innerHTML)
         }
         else
         {
@@ -206,3 +209,6 @@
         }
     }
 })(typeof exports === 'undefined' ? this : exports);
+
+// inner html is an array of child strings right? Alreaedy rendered, so I need to return an array of react elements instead
+// outer html is my attribute string, I need to just keep that as an object to pass as props

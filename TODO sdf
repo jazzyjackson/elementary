@@ -1,0 +1,3 @@
+For all the work of defining a schema for my markup, I get type checking with the functions I write,
+
+But when using the functions in another client side library, I get no type checking ! Could inject some validation logic at the top of every function, kind of like a decorator
